@@ -5,8 +5,10 @@
   깃허브 프로젝트의 최근 _n_개 이슈를 표 형식으로 만들어 출력한다.
   """
 
-  def run(argv) do
-    parse_args(argv)
+  def run (argv) do
+    argv
+    |> parse_args
+    |> process
   end
 
   @doc """
@@ -14,6 +16,17 @@
   깃허브 사용자 이름, 프로젝트 이름, (선택적으로) 가져올 이슈 개수여야 한다.any()
   '{사용자명, 프로젝트명, 이슈 개수}' 또는 :help를 반환한다.
   """
+
+  def process(:help) do
+    IO.puts """
+    usage: issues <user> <project> [ coutn | #{@default_count} ]
+    """
+    System.halt(0)
+  end
+
+  def process({user, project, _count}) do
+    Issues.GithubIssues.fetch(user, project)
+  end
 
   def parse_args(argv) do
     OptionParser.parse(argv, switches: [ help: :boolean],
