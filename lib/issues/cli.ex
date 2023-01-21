@@ -1,4 +1,4 @@
-defmodule Issues.CLI do
+  defmodule Issues.CLI do
   @default_count 4
   @moduledoc """
   명령줄 파싱을 수행한 뒤, 각종 함수를 호출해
@@ -16,16 +16,22 @@ defmodule Issues.CLI do
   """
 
   def parse_args(argv) do
-    parse = OptionParser.parse(argv, switches: [ help: :boolean], aliases: [ h: :help ])
-
-    case parse do
-      { [ help: true], _, _ }
-        -> :help
-      { _, [ user, project, count ], _}
-        -> { user, project, String.to_integer(count) }
-      { _, [ user, project ], _}
-        -> { user, project, @default_count }
-      _ -> :help
-    end
+    OptionParser.parse(argv, switches: [ help: :boolean],
+                                    aliases: [ h: :help ])
+    |> elem(1)
+    |> args_to_internal_representation()
   end
+
+  def args_to_internal_representation([user, project, count]) do
+    { user, project, String.to_integer(count) }
+  end
+
+  def args_to_internal_representation([ user, project ]) do
+    { user, project, @default_count }
+  end
+
+  def args_to_internal_representation(_) do # 잘못된 인자 또는 --help
+    :help
+  end
+
 end
