@@ -8,7 +8,7 @@
   깃허브 프로젝트의 최근 _n_개 이슈를 표 형식으로 만들어 출력한다.
   """
 
-  def run (argv) do
+  def main (argv) do
     argv
     |> parse_args
     |> process
@@ -29,10 +29,16 @@
 
   def process({user, project, count}) do
     Issues.GithubIssues.fetch(user, project)
-    |> Issues.GithubIssues.decode_response()
+    |> decode_response()
     |> sort_into_descending_order()
     |> last(count)
     |> print_table_for_columns(["number", "created_at", "title"])
+  end
+
+  def decode_response({:ok, body}), do: body
+  def decode_response({:error, error}) do
+    IO.puts "Error fetching from Github: #{error["message"]}"
+    System.halt(2)
   end
 
   def last(list, count) do
