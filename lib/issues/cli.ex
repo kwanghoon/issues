@@ -1,4 +1,7 @@
   defmodule Issues.CLI do
+
+    import Issues.TableFormatter, only: [ print_table_for_columns: 2 ]
+
   @default_count 4
   @moduledoc """
   명령줄 파싱을 수행한 뒤, 각종 함수를 호출해
@@ -24,11 +27,12 @@
     System.halt(0)
   end
 
-  def process({user, project, _count}) do
+  def process({user, project, count}) do
     Issues.GithubIssues.fetch(user, project)
     |> Issues.GithubIssues.decode_response()
     |> sort_into_descending_order()
-    |> last(_count)
+    |> last(count)
+    |> print_table_for_columns(["number", "created_at", "title"])
   end
 
   def last(list, count) do
